@@ -14,6 +14,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 
 #IMPORTING SHAPEFILES OF CRB, UPPER BASIN,LOWER BASIN AND CHANGING PROJECTION
+#Change the path for reading shapefiles
 crb_shp = gpd.read_file('/Users/sghimi14/Documents/Research/Analysis_Basin_Shapefiles/basin_CRB_poly.shp')
 crb = crb_shp.to_crs('epsg:4326')
 
@@ -25,6 +26,7 @@ upper = upper_shp.to_crs('epsg:4326')
 
 
 #LOCATING AND COMBINING ALL NETCDF FILES
+#Change the path for reading netcdf files
 file_paths_2018_2023 = glob.glob('Outputs_2018_2023/*.nc')
 file_paths_2010_2017 = glob.glob('Outputs_2010_2017/*.nc')
 file_paths_2004_2009 = glob.glob('Outputs_2004_2009/*.nc')
@@ -38,6 +40,7 @@ snodas_data = xr.open_mfdataset(all_file_paths)
 SWE = snodas_data.SWE
 SWE.rio.write_crs('epsg:4326', inplace=True)
 
+#If you want to change the analysis period, change the start and end date
 start_date = '2004-01-01'
 end_date = '2023-08-06'
 new_time_values = pd.date_range(start=start_date, end=end_date, freq='D')
@@ -69,7 +72,7 @@ for each_st in sites_dict:
     lon = station_info['longitude']
     clip_point = Point(lon, lat)
 
-    SWE_pixel = snodas_clipped.rio.clip([clip_point], crs='epsg:4326', all_touched=False, from_disk=True)
+    SWE_pixel = snodas_clipped.rio.clip([clip_point], crs='epsg:4326', all_touched=False, from_disk=True) #All touched equals to False will clip only the pixel whose centroid falls inside the shapefile boundary
     SWE_df = SWE_pixel.to_dataframe()
     SWE_df = SWE_df.reset_index(level=['y', 'x'], drop=True)
     SWE_df = SWE_df.drop(columns='spatial_ref')
